@@ -8,14 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -25,10 +20,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,6 +30,7 @@ class Utils {
 
     private final static String KEY_LOCATION_UPDATES_REQUESTED = "location-updates-requested";
     private static NotificationManager mNotificationManager;
+    private static NotificationCompat.Builder builder;
 
     static void setRequestingLocationUpdates(Context context, boolean value) {
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -55,9 +48,10 @@ class Utils {
 
         placeName ="Reached "+placeName;
 
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
 
         // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"Reached")
+        builder = new NotificationCompat.Builder(context,"Reached")
                 .setSmallIcon(R.drawable.notification_small_icon)
                 .setColor(Color.GREEN)
                 .setContentTitle("Reached")
@@ -65,7 +59,8 @@ class Utils {
                 .addAction(R.drawable.notification_small_icon,"Stop",stopRingPendingIntent)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(false)
-                .setOngoing(true);
+                .setOngoing(true)
+                .setSound(notification,AudioManager.STREAM_ALARM);
 
         SharedPreferences settings = context.getSharedPreferences("settings", 0);
         boolean dark = settings.getBoolean("dark",false);
@@ -107,9 +102,9 @@ class Utils {
         Log.d(TAG, "playRing");
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         r = RingtoneManager.getRingtone(context,notification);
-        r.setStreamType(AudioManager.STREAM_RING);
+        r.setStreamType(AudioManager.STREAM_ALARM);
 
-        if(!r.isPlaying()) r.play();
+        //if(!r.isPlaying()) r.play();
 
         vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         long[] pattern = {0,1000,1000};

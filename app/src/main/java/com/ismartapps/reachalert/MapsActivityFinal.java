@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -156,6 +157,10 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             radius =  (double) targetDetail.getFloat("targetRad",500);
             showAd();
         }
+
+        targetPlaceName.setGravity(Gravity.END);
+        targetPlaceType.setGravity(Gravity.END);
+
         marker=null;
         cancel.setText("Stop");
         circle=null;
@@ -213,6 +218,8 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             Toast.makeText(MapsActivityFinal.this, "Cancel Tracking", Toast.LENGTH_SHORT).show();
             return true;
         });
+
+        cancel.setVisibility(View.VISIBLE);
 
         int i=0;
         confirmationDialog = new ConfirmationDialog(this,"Cancel Tracking",
@@ -307,17 +314,17 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
 
     private void initVars(){
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        targetPlaceName = (TextView) findViewById(R.id.place_name);
-        targetPlaceType = (TextView) findViewById(R.id.place_type);
-        targetPlaceAddress = (TextView) findViewById(R.id.place_address);
-        cancel = findViewById(R.id.confirm);
-        mCurrLoc = (ImageView) findViewById(R.id.location_btn_img);
-        searchCard = (CardView) findViewById(R.id.searchbar_layout_card);;
-        mCancel = (ImageView) findViewById(R.id.place_tick_image);
-        radiusControlCard = (CardView) findViewById(R.id.radius_controller_container_card);
-        zoomIn = (ImageView) findViewById(R.id.zoom_in);
+        targetPlaceName = findViewById(R.id.place_name);
+        targetPlaceType = findViewById(R.id.place_type);
+        targetPlaceAddress = findViewById(R.id.place_address);
+        cancel = findViewById(R.id.cancel);
+        mCurrLoc = findViewById(R.id.location_btn_img);
+        searchCard = findViewById(R.id.searchbar_layout_card);
+        mCancel = findViewById(R.id.place_cancel_image);
+        radiusControlCard = findViewById(R.id.radius_controller_container_card);
+        zoomIn = findViewById(R.id.zoom_in);
         zoomIn.setVisibility(View.INVISIBLE);
-        zoomOut = (ImageView) findViewById(R.id.zoom_ot);
+        zoomOut = findViewById(R.id.zoom_ot);
         zoomOut.setVisibility(View.INVISIBLE);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -377,7 +384,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         }
         else if(latLng.latitude == recents.getFloat("recent_two_lat",0) && latLng.longitude == recents.getFloat("recent_two_long",0))
         {
-            Log.d(TAG, "updateRecents: 2");;
+            Log.d(TAG, "updateRecents: 2");
             editor.putString("recent_two", recents.getString("recent_one", "Recent Location"));
             editor.putFloat("recent_two_lat", recents.getFloat("recent_one_lat", 0));
             editor.putFloat("recent_two_long", recents.getFloat("recent_one_long", 0));

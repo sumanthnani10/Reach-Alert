@@ -802,7 +802,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
         if (autocompleteFragment != null) {
-            autocompleteFragment.setHint("Search here");
+            autocompleteFragment.setHint("Enter your Destination");
         }
 
         if(dark){

@@ -13,7 +13,7 @@
         android:id="@+id/activity_maps_primary"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+        <fragment
             android:id="@+id/maps_primary"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
@@ -190,6 +190,7 @@
                         android:textColor="@color/quantum_black_text"
                         android:singleLine="true"
                         android:layout_marginRight="16dp"
+                        android:layout_marginEnd="16dp"
                         android:id="@+id/place_name"
                         android:ellipsize="none"
                         app:autoSizeTextType="uniform"/>
@@ -204,6 +205,7 @@
                         android:textSize="13sp"
                         android:singleLine="true"
                         android:layout_marginRight="16dp"
+                        android:layout_marginEnd="16dp"
                         android:id="@+id/place_type"
                         android:ellipsize="none"
                         app:autoSizeTextType="uniform"/>
@@ -250,14 +252,16 @@
 
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:elevation="9dp"
-                tools:targetApi="lollipop">
+                tools:targetApi="lollipop"
+                android:layout_alignParentEnd="true">
 
                 <ImageView
                     android:layout_width="64dp"
@@ -265,7 +269,8 @@
                     android:id="@+id/place_tick_image"
                     android:src="@mipmap/ic_launcher_confirm_location"
                     android:visibility="invisible"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -276,7 +281,34 @@
                     android:textStyle="bold"
                     android:textColor="@color/quantum_black_100"
                     android:shadowColor="@color/quantum_white_100"
-                    android:shadowRadius="30"/>
+                    android:shadowRadius="30"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true" />
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:id="@+id/place_cancel_image"
+                    android:src="@mipmap/ic_launcher_cancel"
+                    android:visibility="invisible"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/place_cancel_image"
+                    android:textSize="12sp"
+                    android:visibility="invisible"
+                    android:id="@+id/cancel"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:textStyle="bold"
+                    android:text="Cancel"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/quantum_black_100"
+                    android:shadowColor="@color/quantum_white_100"
+                    android:shadowRadius="30"
+                    android:layout_marginStart="18dp" />
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
