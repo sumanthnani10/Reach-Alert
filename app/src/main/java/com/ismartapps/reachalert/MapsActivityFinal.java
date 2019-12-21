@@ -59,7 +59,7 @@ import java.util.Locale;
 public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    private TextView targetPlaceName,targetPlaceType,targetPlaceAddress,cancel;
+    private TextView targetPlaceName,targetPlaceType,targetPlaceAddress,cancel,changeRadius;
     private CardView searchCard, radiusControlCard;
     private Circle circle = null;
     private Marker marker = null;
@@ -130,7 +130,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
     private void init() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         Intent intent = getIntent();
-
+        changeRadius.setVisibility(View.VISIBLE);
 
         if(intent.getIntExtra("from",2)==2)
         {
@@ -220,6 +220,43 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         });
 
         cancel.setVisibility(View.VISIBLE);
+
+        ConfirmationDialog confirmationDialogChangeRadius = new ConfirmationDialog(this,"Change Radius",
+                "Do you want to change Radius?",activity)
+        {
+            @Override
+            public void onClick(View view) {
+                switch(view.getId())
+                {
+                    case R.id.confirm_button:
+
+                        Toast.makeText(MapsActivityFinal.this, "Stopped Tracking", Toast.LENGTH_SHORT).show();
+                        updateCancelled();
+                        Intent intent1 = new Intent(MapsActivityFinal.this, LocationUpdatesService.class);
+                        intent1.setAction(LocationUpdatesService.ACTION_STOP_FOREGROUND_SERVICE);
+                        startService(intent1);
+                        Intent intent2 = new Intent(MapsActivityFinal.this,MapsActivitySecondary.class);
+                        intent2.putExtra("targetDetails", targetDetails);
+                        startActivity(intent2);
+                        showAd();
+                        dismiss();
+                        finish();
+                        break;
+
+                    case R.id.no_button:
+                        dismiss();
+                        break;
+                }
+            }
+        };
+        confirmationDialogChangeRadius.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        changeRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmationDialogChangeRadius.show();
+            }
+        });
 
         int i=0;
         confirmationDialog = new ConfirmationDialog(this,"Cancel Tracking",
@@ -328,10 +365,11 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         zoomOut.setVisibility(View.INVISIBLE);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         drawerLayout = findViewById(R.id.drawer_layout);
+        changeRadius = findViewById(R.id.change_radius);
     }
 
     private void uploadData(boolean mail,String email,String name,String targetName,String targetAddress,LatLng targetlatLng,String time) {
-        UserLatestData user = new UserLatestData(email,name,targetName,targetAddress,targetlatLng,time);
+        UserLatestData user = new UserLatestData(targetName,targetAddress,targetlatLng,time);
         if (mail){
             databaseReference.child("Last Used").child(name).setValue(user);
             if (FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()!=null)

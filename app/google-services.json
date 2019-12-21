@@ -52,6 +52,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "985260997161-7so9ulkk1dlsbrlutbb3j2fq134gee52.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ismartapps.reachalert",
+            "certificate_hash": "8f510c26c253d9dc3fb58572cba716697ff82a6a"
+          }
+        },
+        {
           "client_id": "985260997161-mp13bv67hhs8lua8oo4ia6sfcd1uc74u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

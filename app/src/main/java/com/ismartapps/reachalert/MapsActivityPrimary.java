@@ -300,6 +300,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         SharedPreferences sharedPreferences = getSharedPreferences("userdetails",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String dbname = "User Name";
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user.getEmail()!=null && !user.getEmail().equals(""))
@@ -311,6 +312,8 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             if (dbname != null) {
                 dbname = dbname.replaceAll("\\.","_").replaceAll("#","_").replaceAll("\\$","_").replaceAll("\\[","_").replaceAll("]","_");
             }
+            databaseReference.child("Last Used").child(dbname).child("name").setValue(user.getDisplayName());
+            databaseReference.child("Last Used").child(dbname).child("email").setValue(user.getEmail());
             editor.putString("dbname",dbname);
         }
         else
@@ -320,11 +323,12 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             sharedPreferences = getSharedPreferences("userdetails",MODE_PRIVATE);
             userName.setText(sharedPreferences.getString("name","User Name"));
             dbname = user.getPhoneNumber();
+            databaseReference.child("Last Used").child(dbname).child("name").setValue(userName.getText());
+            databaseReference.child("Last Used").child(dbname).child("email").setValue(dbname);
             editor.putString("dbname",dbname);
         }
 
         editor.apply();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.child("Last Used").child(dbname).child("Last Opened").setValue(new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
         Log.d(TAG, "init: 123456789012345678901234567890"+new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
         Picasso.get()

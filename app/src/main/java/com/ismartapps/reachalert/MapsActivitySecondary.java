@@ -4,26 +4,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.adcolony.sdk.*;
-import com.facebook.ads.*;
+import com.facebook.ads.Ad;
+import com.facebook.ads.AdError;
+import com.facebook.ads.AdSettings;
+import com.facebook.ads.AudienceNetworkAds;
+import com.facebook.ads.InterstitialAd;
+import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,8 +37,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
-
-import java.io.Serializable;
 
 public class MapsActivitySecondary extends FragmentActivity implements OnMapReadyCallback {
 
@@ -86,22 +84,22 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     }
 
     private void initVars(){
-        targetPlaceName = (TextView) findViewById(R.id.place_name);
-        targetPlaceType = (TextView) findViewById(R.id.place_type);
-        targetPlaceAddress = (TextView) findViewById(R.id.place_address);
+        targetPlaceName = findViewById(R.id.place_name);
+        targetPlaceType = findViewById(R.id.place_type);
+        targetPlaceAddress = findViewById(R.id.place_address);
         confirm = findViewById(R.id.confirm);
-        mCurrLoc = (ImageView) findViewById(R.id.location_btn_img);
-        searchCard = (CardView) findViewById(R.id.searchbar_layout_card);;
-        mRadiusTick = (ImageView) findViewById(R.id.place_tick_image);
-        radiusControlCard = (CardView) findViewById(R.id.radius_controller_container_card);
-        radiusController = (SeekBar) findViewById(R.id.radius_controller);
-        zoomIn = (ImageView) findViewById(R.id.zoom_in);
-        zoomOut = (ImageView) findViewById(R.id.zoom_ot);
+        mCurrLoc = findViewById(R.id.location_btn_img);
+        searchCard = findViewById(R.id.searchbar_layout_card);
+        mRadiusTick = findViewById(R.id.place_tick_image);
+        radiusControlCard = findViewById(R.id.radius_controller_container_card);
+        radiusController = findViewById(R.id.radius_controller);
+        zoomIn = findViewById(R.id.zoom_in);
+        zoomOut = findViewById(R.id.zoom_ot);
         drawerLayout = findViewById(R.id.drawer_layout);
         placeDetailsContainer = findViewById(R.id.Place_details_view_relative_container);
     }
 
-    private void init() {
+    private void init(){
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         Intent intent = getIntent();
         targetDetails = intent.getExtras().getParcelable("targetDetails");
@@ -330,7 +328,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     private void goToFinal() {
         Intent intent = new Intent(this,MapsActivityFinal.class);
         targetDetails.setRadius(circle.getRadius());
-        intent.putExtra("targetDetails", (Parcelable) targetDetails);
+        intent.putExtra("targetDetails", targetDetails);
         intent.putExtra("from",2);
         startActivity(intent);
     }
