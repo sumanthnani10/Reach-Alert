@@ -221,6 +221,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
                         android:ellipsize="none"
+                        android:visibility="invisible"
                         android:layout_below="@id/place_type"
                         app:autoSizeTextType="uniform" />
 
