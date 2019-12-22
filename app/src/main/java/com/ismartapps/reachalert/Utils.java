@@ -59,8 +59,7 @@ class Utils {
                 .addAction(R.drawable.notification_small_icon,"Stop",stopRingPendingIntent)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(false)
-                .setOngoing(true)
-                .setSound(notification,AudioManager.STREAM_ALARM);
+                .setOngoing(true);
 
         SharedPreferences settings = context.getSharedPreferences("settings", 0);
         boolean dark = settings.getBoolean("dark",false);
@@ -104,7 +103,7 @@ class Utils {
         r = RingtoneManager.getRingtone(context,notification);
         r.setStreamType(AudioManager.STREAM_ALARM);
 
-        //if(!r.isPlaying()) r.play();
+        if(!r.isPlaying()) r.play();
 
         vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         long[] pattern = {0,1000,1000};
