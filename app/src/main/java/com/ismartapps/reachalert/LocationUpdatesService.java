@@ -67,7 +67,6 @@ public class LocationUpdatesService extends Service {
     private Location mLocation;
     public boolean isCancelled=false;
     private static String name;
-    private String placeId;
     private SharedPreferences targetDetails;
 
     public LocationUpdatesService() {
@@ -92,8 +91,8 @@ public class LocationUpdatesService extends Service {
         targetDetails = getSharedPreferences("targetDetails",MODE_PRIVATE);
         target = new LatLng((double) targetDetails.getFloat("targetLat",0),(double) targetDetails.getFloat("targetLang",0));
         targetImage = null;
-        placeId = targetDetails.getString("targetId",null);
-        if(placeId!=null)
+        String placeId = targetDetails.getString("targetId", null);
+        if(placeId !=null)
         {
             this.setTargetImage(placeId);
         }
