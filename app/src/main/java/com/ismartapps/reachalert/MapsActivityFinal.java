@@ -72,19 +72,17 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
     private TargetDetails targetDetails;
     private DrawerLayout drawerLayout;
     private int activityCount;
-    private String userName;
+    private String userName,placeId;
     private InterstitialAd interstitialAd;
     private SharedPreferences targetDetail;
 
     private static final String TAG = MapsActivityFinal.class.getSimpleName();
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private MyReceiver myReceiver = new MyReceiver();
     private Activity activity = this;
     private boolean dark,fromNotification;
     private double radius;
     private ConfirmationDialog confirmationDialog;
     private int back=0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +137,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             targetPlaceAddress.setText(targetDetails.getAddress());
             targetLatLng = targetDetails.getTarget();
             radius = targetDetails.getRadius();
+            placeId = targetDetails.getPlaceId();
 
             SharedPreferences.Editor editor = targetDetail.edit();
             editor.putString("targetName",targetPlaceName.getText().toString());
@@ -146,6 +145,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             editor.putFloat("targetLat", (float) targetLatLng.latitude);
             editor.putFloat("targetLang", (float) targetLatLng.longitude);
             editor.putFloat("targetRad", (float) radius);
+            editor.putString("targetId", placeId);
             editor.apply();
         }
         else
@@ -155,6 +155,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             targetPlaceAddress.setText(targetDetail.getString("targetAddress","Address"));
             targetLatLng =  new LatLng((double) targetDetail.getFloat("targetLat",0),(double) targetDetail.getFloat("targetLang",0));
             radius =  (double) targetDetail.getFloat("targetRad",500);
+            placeId = targetDetail.getString("targetId",null);
             showAd();
         }
 

@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -28,6 +30,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class LocationUpdatesService extends Service {
 
@@ -50,11 +61,13 @@ public class LocationUpdatesService extends Service {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
     private Handler mServiceHandler;
+    private Bitmap targetImage;
     private LatLng target,current;
     private double radius;
     private Location mLocation;
     public boolean isCancelled=false;
     private static String name;
+    private String placeId;
     private SharedPreferences targetDetails;
 
     public LocationUpdatesService() {
@@ -78,6 +91,13 @@ public class LocationUpdatesService extends Service {
 
         targetDetails = getSharedPreferences("targetDetails",MODE_PRIVATE);
         target = new LatLng((double) targetDetails.getFloat("targetLat",0),(double) targetDetails.getFloat("targetLang",0));
+        targetImage = null;
+        placeId = targetDetails.getString("targetId",null);
+        if(placeId!=null)
+        {
+            this.setTargetImage(placeId);
+        }
+
         name = targetDetails.getString("targetName","Destination");
         radius = (double) targetDetails.getFloat("targetRad",500);
 
@@ -96,6 +116,38 @@ public class LocationUpdatesService extends Service {
 
             mNotificationManager.createNotificationChannel(mChannel);
         }
+    }
+
+    public void setTargetImage(String placeId) {
+
+        PlacesClient placesClient = Places.createClient(this);
+        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS,Place.Field.NAME);
+        FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(placeId, fields).build();
+        placesClient.fetchPlace(placeRequest).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+
+            if (place.getPhotoMetadatas() != null) {
+                if (place.getPhotoMetadatas().size() > 0) {
+                    // Get the photo metadata.
+                    PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+
+                    // Get the attribution text.
+                    String attributions = photoMetadata.getAttributions();
+                    // Create a FetchPhotoRequest.
+                    FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                            .build();
+                    placesClient.fetchPhoto(photoRequest).addOnSuccessListener(fetchPhotoResponse -> {
+                        targetImage = fetchPhotoResponse.getBitmap();
+                    }).addOnFailureListener((exception) -> {
+                        if (exception instanceof ApiException) {
+                            ApiException apiException = (ApiException) exception;
+                            int statusCode = apiException.getStatusCode();
+                            Log.e(TAG, "Place not found: (Primary) " + exception.getMessage()+" , "+statusCode);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
@@ -207,6 +259,14 @@ public class LocationUpdatesService extends Service {
         {
             builder.setColor(Color.BLACK)
                     .setColorized(true);
+        }
+
+        if (targetImage!=null)
+        {
+            builder.setLargeIcon(targetImage)
+                    .setStyle(new NotificationCompat.BigPictureStyle()
+                            .bigPicture(targetImage)
+                            .bigLargeIcon(null));
         }
 
         // Set the Channel ID for Android O.
