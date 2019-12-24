@@ -1,32 +1,21 @@
 package com.ismartapps.reachalert;
 
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Log.d(TAG, "onCreate");
     }
 
     @Override
@@ -126,13 +116,23 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "startMain");
         Intent intent = getIntent();
         Intent mainIntent = new Intent(this, MapsActivityPrimary.class);
-        if(intent.getStringExtra("from").equals("SAN")){
+        
+        if(intent.getStringExtra("from").equals("SAN"))
+        {
         String text = intent.getStringExtra("name");
         Log.d(TAG, "onCreate: "+text+" , "+intent.getExtras());
         double[] latLng = intent.getExtras().getDoubleArray("latlng");
         mainIntent.putExtra("name",text);
         mainIntent.putExtra("placeId",intent.getStringExtra("placeId"));
-        mainIntent.putExtra("latlng",latLng);}
+        mainIntent.putExtra("latlng",latLng);
+        }
+        
+        else if(intent.getStringExtra("shared location")!=null)
+        {
+            Log.d(TAG, "startMain: ---------------");
+            String s = intent.getStringExtra("shared location");
+            mainIntent.putExtra("shared location",s);
+        }
         startActivity(mainIntent);
         finish();
     }

@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,22 +14,23 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 public class SplashActivity extends Activity {
     private static final String TAG = "SA";
     private Intent intent,mainIntent;
+    private boolean fromShare;
+    private LatLng latLng;
+    private String action;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +53,28 @@ public class SplashActivity extends Activity {
             shadow.startAnimation(AnimationUtils.loadAnimation(SplashActivity.this,R.anim.shadow_anim));
         },1500);
 
+        fromShare = false;
         mainIntent = getIntent();
+        action = mainIntent.getAction();
+        Uri data;
+
+        Log.d(TAG, "onCreate: -");
 
         if(mainIntent.getBooleanExtra("fromNotification",false))
         {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(mainIntent.getExtras().getInt("id"));
+        }
+        else if(action!=null)
+        {
+            if(action.equals(Intent.ACTION_VIEW))
+            {
+                fromShare = true;
+                data = mainIntent.getData();
+                action = data.toString();
+                //latLng = new LatLng(Double.parseDouble(action.substring(action.indexOf(":")+1,action.indexOf(","))),Double.parseDouble(action.substring(action.indexOf(",")+1,action.indexOf("?"))));
+                Log.d(TAG, "onCreate:------+ ");
+            }
         }
 
         Thread thread = new Thread(){
@@ -75,7 +93,7 @@ public class SplashActivity extends Activity {
                         SharedPreferences.Editor editor = targetDetails.edit();
                         editor.clear();
                         editor.apply();
-                        if(mainIntent.getBooleanExtra("fromNotification",false))
+                        if(mainIntent.getBooleanExtra("fromNotification",false) && !fromShare)
                         {
                             SharedPreferences sharedPreferences = getSharedPreferences("userdetails",MODE_PRIVATE);
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -95,6 +113,11 @@ public class SplashActivity extends Activity {
                         {
                             intent = new Intent(SplashActivity.this, LoginActivity.class);
                             intent.putExtra("from","SA");
+                            if (fromShare)
+                            {
+                                intent.putExtra("shared location",action);
+                                intent.putExtra("from","shared");
+                            }
                         }
                     }
                     else
@@ -102,6 +125,7 @@ public class SplashActivity extends Activity {
                         intent = new Intent(SplashActivity.this,MapsActivityFinal.class);
                         intent.putExtra("from",1);
                     }
+                    Log.d(TAG, "run: "+intent);
                     startActivity(intent);
                     finish();
 
@@ -123,5 +147,4 @@ public class SplashActivity extends Activity {
         }
         return serviceRunning;
     }
-
 }

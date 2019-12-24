@@ -112,7 +112,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private TargetDetails targetDetails;
-    private boolean fromNotification=false;
+    private boolean fromNotification=false,dark,fromShared;
     private int created=0,back=0;
     private Intent mainIntent;
     private String targetPlaceId=null;
@@ -120,7 +120,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
     private SharedPreferences searched;
     private SharedPreferences recents;
     private SharedPreferences settings;
-    private boolean dark;
     private AutocompleteSupportFragment autocompleteFragment;
     private InterstitialAd interstitialAd;
 
@@ -136,11 +135,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         else{
             setTheme(R.style.AppTheme);
             setContentView(R.layout.activity_maps);
-        }
-        Log.d(TAG, "onCreate");
-        mainIntent = getIntent();
-        if (mainIntent!=null && mainIntent.getStringExtra("name")!=null) {
-            fromNotification=true;
         }
         initVars();
         AudienceNetworkAds.initialize(this);
@@ -256,6 +250,18 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         back=0;
         Log.d(TAG, "onResume");
 
+        mainIntent = getIntent();
+        Log.d(TAG, "onertyu"+mainIntent);
+        if (mainIntent!=null && mainIntent.getStringExtra("name")!=null) {
+            Log.d(TAG, "onCreate: fromNot");
+            fromNotification=true;
+        }
+        else if(mainIntent!=null && mainIntent.getStringExtra("shared location")!=null)
+        {
+            Log.d(TAG, "onCreate:----shared ");
+            fromShared = true;
+        }
+
         updateRecentMenu();
 
         if (!checkPermissions()) {
@@ -330,7 +336,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
 
         editor.apply();
         databaseReference.child("Last Used").child(dbname).child("Last Opened").setValue(new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
-        Log.d(TAG, "init: 123456789012345678901234567890"+new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
         Picasso.get()
                 .load(user.getPhotoUrl())
                 .error(R.mipmap.ic_user_image)
@@ -1083,6 +1088,14 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 }
                 else
                     fetchPlaceDetails(targetPlaceId);
+            }
+            else if(fromShared)
+            {
+                getDeviceLocation(0);
+                fromShared = false;
+                String action = mainIntent.getStringExtra("shared location");
+                targetLatLng = new LatLng(Double.parseDouble(action.substring(action.indexOf(":")+1,action.indexOf(","))),Double.parseDouble(action.substring(action.indexOf(",")+1,action.indexOf("?"))));
+                movecamera(targetLatLng,15f,"Dropped Pin",getAddressFromMarker(targetLatLng),"Point of interest");
             }
             else
                 getDeviceLocation(1);
