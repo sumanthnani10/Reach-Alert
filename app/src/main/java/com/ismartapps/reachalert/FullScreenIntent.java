@@ -3,6 +3,7 @@ package com.ismartapps.reachalert;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -35,13 +36,27 @@ public class FullScreenIntent extends AppCompatActivity {
             setContentView(R.layout.fullscreenintent);
         }
         TextView stop = findViewById(R.id.stop);
+        TextView text = findViewById(R.id.location_name);
         Context context = this;
         Log.d(TAG, "onReceive: Stopping Ring");
+        String placeName = "Reached "+getIntent().getStringExtra("location_name");
+        text.setText(placeName);
         stop.setOnClickListener(view -> {
             Utils.stopRing(context);
             Utils.clearNotifications();
             finish();
         });
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Utils.stopRing(context);
+                Utils.clearNotifications();
+                finish();
+            }
+        },5*60*1000);
+
     }
 
     private void hideNavigationBar() {

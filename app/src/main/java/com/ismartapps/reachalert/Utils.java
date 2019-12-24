@@ -47,6 +47,7 @@ class Utils {
         Intent fullscreenIntent = new Intent(Intent.ACTION_MAIN,null);
         fullscreenIntent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         fullscreenIntent.setClass(context,FullScreenIntent.class);
+        fullscreenIntent.putExtra("location_name",placeName);
         PendingIntent fullscreenPendingIntent = PendingIntent.getActivity(context,22,fullscreenIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         placeName ="Reached "+placeName;
