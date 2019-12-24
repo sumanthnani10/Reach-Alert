@@ -82,7 +82,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.SphericalUtil;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -506,8 +505,9 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 case R.id.recent_one:
                     if (recents.getString("recent_one_pid", null) == null || recents.getString("recent_one_pid", null).equals(""))
                     {
-                        movecamera(new LatLng(recents.getFloat("recent_one_lat",0),recents.getFloat("recent_one_long",0)),
-                                zoom,recents.getString("recent_one","Recent Location"),
+                        LatLng t = new LatLng(recents.getFloat("recent_one_lat",0),recents.getFloat("recent_one_long",0));
+                        if (!t.equals(new LatLng(0, 0)))
+                        movecamera(t, zoom,recents.getString("recent_one","Recent Location"),
                                 getAddressFromMarker(new LatLng(recents.getFloat("recent_one_lat",0),recents.getFloat("recent_one_long",0))),
                                 "Point of interest");
                     }
@@ -521,10 +521,11 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 case R.id.recent_two:
                     if (recents.getString("recent_two_pid", null) == null || recents.getString("recent_two_pid", null).equals(""))
                     {
-                        movecamera(new LatLng(recents.getFloat("recent_two_lat",0),recents.getFloat("recent_two_long",0)),
-                                zoom,recents.getString("recent_two","Recent Location"),
-                                getAddressFromMarker(new LatLng(recents.getFloat("recent_two_lat",0),recents.getFloat("recent_two_long",0))),
-                                "Point of interest");
+                        LatLng t = new LatLng(recents.getFloat("recent_two_lat",0),recents.getFloat("recent_two_long",0));
+                        if (!t.equals(new LatLng(0, 0)))
+                            movecamera(t, zoom,recents.getString("recent_two","Recent Location"),
+                                    getAddressFromMarker(new LatLng(recents.getFloat("recent_two_lat",0),recents.getFloat("recent_two_long",0))),
+                                    "Point of interest");
                     }
                     else
                     {
@@ -536,10 +537,11 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 case R.id.recent_three:
                     if (recents.getString("recent_three_pid", null) == null || recents.getString("recent_three_pid", null).equals(""))
                     {
-                        movecamera(new LatLng(recents.getFloat("recent_three_lat",0),recents.getFloat("recent_three_long",0)),
-                                zoom,recents.getString("recent_three","Recent Location"),
-                                getAddressFromMarker(new LatLng(recents.getFloat("recent_three_lat",0),recents.getFloat("recent_three_long",0))),
-                                "Point of interest");
+                        LatLng t = new LatLng(recents.getFloat("recent_three_lat",0),recents.getFloat("recent_three_long",0));
+                        if (!t.equals(new LatLng(0, 0)))
+                            movecamera(t, zoom,recents.getString("recent_three","Recent Location"),
+                                    getAddressFromMarker(new LatLng(recents.getFloat("recent_three_lat",0),recents.getFloat("recent_three_long",0))),
+                                    "Point of interest");
                     }
                     else
                     {
@@ -864,7 +866,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             address = obj.getAddressLine(0);
             Log.d(TAG, "getAddressFromMarker: (Primary) "+address);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return address;
