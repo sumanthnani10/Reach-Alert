@@ -44,7 +44,10 @@ class Utils {
         Intent stopRingIntent = new Intent(context,StopRing.class);
         PendingIntent stopRingPendingIntent = PendingIntent.getBroadcast(context,0,stopRingIntent,0);
 
-        PendingIntent fullscreenPendingIntent = PendingIntent.getActivity(context,22,new Intent(context,FullScreenIntent.class),PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent fullscreenIntent = new Intent(Intent.ACTION_MAIN,null);
+        fullscreenIntent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        fullscreenIntent.setClass(context,FullScreenIntent.class);
+        PendingIntent fullscreenPendingIntent = PendingIntent.getActivity(context,22,fullscreenIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         placeName ="Reached "+placeName;
 
@@ -56,6 +59,8 @@ class Utils {
                 .setColor(Color.GREEN)
                 .setContentTitle("Reached")
                 .setContentText(placeName)
+                .setContentIntent(fullscreenPendingIntent)
+                .setFullScreenIntent(fullscreenPendingIntent,true)
                 .addAction(R.drawable.notification_small_icon,"Stop",stopRingPendingIntent)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(false)
