@@ -996,10 +996,12 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
 
         mLocationTick.setVisibility(View.INVISIBLE);
         confirm.setText("");
+        float tilt = 32f;
+        if(mMap.getMapType()==2)tilt=0f;
 
         CameraPosition movingPlace = new CameraPosition.Builder()
                 .target(latLng)
-                .tilt(32f).zoom(zoom).build();
+                .tilt(tilt).zoom(zoom).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(movingPlace));
 
         if (!title.equals("Current Location")){
