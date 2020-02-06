@@ -21,7 +21,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             app:cardElevation="8dp"
             app:cardCornerRadius="10dp"
             android:layout_marginTop="10dp"
@@ -43,6 +43,21 @@
                     />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_below="@id/searchbar_layout_card"
+            android:layout_marginTop="108dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_map_type_dark"
+            android:id="@+id/map_type"
+            android:visibility="invisible"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/location_button" />
 
         <ImageView
             android:layout_width="48dp"

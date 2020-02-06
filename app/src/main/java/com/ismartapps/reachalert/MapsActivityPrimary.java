@@ -94,7 +94,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
 
     private GoogleMap mMap;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private ImageView mCurrLoc, mLocationTick,zoomIn,zoomOut,userPic;
+    private ImageView mCurrLoc, mLocationTick,zoomIn,zoomOut,userPic,mapType;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String TAG = "MapsActivityPrimary";
@@ -296,6 +296,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         Log.d(TAG, "init:(Primary) initializing");
 
         navigationView.setVisibility(View.VISIBLE);
+        mapType.setVisibility(View.VISIBLE);
 
         mCurrLoc.setOnClickListener(v -> {
             Log.d(TAG, "onClick:(Primary) Location Button is Clicked");
@@ -391,6 +392,21 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        mapType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mMap.getMapType()==1){
+                    mMap.setMapType(2);
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(mMap.getCameraPosition().target).zoom(mMap.getCameraPosition().zoom).tilt(0f).build()));
+                }
+                else
+                {
+                    mMap.setMapType(1);
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(mMap.getCameraPosition().target).zoom(mMap.getCameraPosition().zoom).tilt(32f).build()));
+                }
+            }
+        });
+
         autocomplete();
 
         MenuItem theme = menu.findItem(R.id.theme);
@@ -418,7 +434,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             return true;
         });
 
-        mLocationTick.setOnClickListener(v -> {
+        mLocationTick.setOnClickListener(v ->                                                                                                           {
             Log.d(TAG, "onClick: (Primary) Target Location Confirmed : (Primary) TPID" + targetLatLng+targetPlaceId);
             targetDetails = new TargetDetails(targetPlaceName.getText().toString(),targetPlaceType.getText().toString(),targetPlaceAddress.getText().toString(),new double[]{currentLocationLatlng.latitude,currentLocationLatlng.longitude},new double[]{targetLatLng.latitude,targetLatLng.longitude},targetPlaceId);
             showDialog();
@@ -731,6 +747,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         zoomIn.setVisibility(View.VISIBLE);
         zoomOut = findViewById(R.id.zoom_ot);
         zoomOut.setVisibility(View.VISIBLE);
+        mapType=findViewById(R.id.map_type);
         targetPlacePhotosScrollViewLinearLayout = findViewById(R.id.place_images_scroll_linearLayout);
         placeDetailsContainer = findViewById(R.id.Place_details_view_relative_container);
         searchContainer = findViewById(R.id.searchbar_layout_card);
