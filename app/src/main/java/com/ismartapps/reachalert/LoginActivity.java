@@ -105,7 +105,8 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else{
-                    startMain();}
+                    startMain();
+                }
             } else {
                 Log.d(TAG, "onActivityResult: Sign in failed");
             }
@@ -154,8 +155,8 @@ public class LoginActivity extends AppCompatActivity {
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
                         .setTosAndPrivacyPolicyUrls(
-                                "https://sites.google.com/view/reach-alert/home",
-                                "https://sites.google.com/view/reach-alert/home")
+                                "https://sites.google.com/view/reach-alert/privacy-policy",
+                                "https://sites.google.com/view/reach-alert/privacy-policy")
                         .build(),
                 RC_SIGN_IN);
     }

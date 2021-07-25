@@ -47,28 +47,28 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:layout_below="@id/searchbar_layout_card"
-            android:layout_marginTop="108dp"
+            android:layout_marginTop="84dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/ic_map_type"
             android:id="@+id/map_type"
             android:visibility="invisible"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="10dp"
-            android:contentDescription="@string/location_button" />
+            android:contentDescription="Map Type" />
 
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
-            android:layout_above="@id/Place_details_view_relative_container"
+            android:layout_above="@id/confirm_buttons"
             android:layout_marginBottom="24dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher_current_location"
             android:id="@+id/location_btn_img"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="10dp"
-            android:contentDescription="@string/location_button" />
+            android:contentDescription="My Location" />
 
         <ImageView
             android:layout_width="40dp"
@@ -82,7 +82,7 @@
             android:id="@+id/zoom_ot"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="14dp"
-            android:contentDescription="@string/location_button" />
+            android:contentDescription="Zoom Out" />
 
         <ImageView
             android:layout_width="40dp"
@@ -96,7 +96,7 @@
             android:id="@+id/zoom_in"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="14dp"
-            android:contentDescription="@string/location_button" />
+            android:contentDescription="Zoom In" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -114,7 +114,7 @@
                 app:cardBackgroundColor="#ffff"
                 app:cardCornerRadius="10dp"
                 android:layout_marginBottom="2dp"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <SeekBar
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -200,7 +200,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_below="@id/place_images_scroll"
-                        android:textSize="20sp"
+                        android:textSize="16sp"
                         android:textColor="@color/quantum_black_text"
                         android:singleLine="true"
                         android:layout_marginRight="16dp"
@@ -216,7 +216,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="0dp"
                         android:layout_below="@id/place_name"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:singleLine="true"
                         android:layout_marginRight="16dp"
                         android:layout_marginEnd="16dp"
@@ -263,7 +263,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginLeft="16dp"
-                            android:textSize="16sp"
+                            android:textSize="12sp"
                             android:textColor="@color/quantum_black_text"
                             android:id="@+id/place_address"
                             android:ellipsize="none"
@@ -277,24 +277,116 @@
                         android:id="@+id/powered_by_google_logo"
                         android:layout_below="@id/Place_details_table"
                         android:layout_marginLeft="16dp"
+                        android:layout_marginBottom="4dp"
                         android:layout_marginStart="16dp" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
-
+        </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"
                 android:elevation="9dp"
                 tools:targetApi="lollipop"
+                android:id="@+id/confirm_buttons"
+                android:layout_above="@+id/Place_details_view_relative_container"
                 android:layout_alignParentEnd="true">
 
-                <ImageView
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/place_tick_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    android:layout_marginBottom="8dp"
+                    app:cardBackgroundColor="@color/quantum_black_100"
+                    app:cardCornerRadius="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_tick_white"
+                            />
+
+                        <Space
+                            android:layout_width="8dp"
+                            android:layout_height="0dp"/>
+
+                        <TextView
+                            android:id="@+id/confirm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/quantum_white_100"
+                            android:textSize="16sp"
+                            android:textStyle="normal"
+                            tools:text="Confirm Location" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/place_cancel_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    app:cardCornerRadius="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_cancel"
+                            />
+
+                        <Space
+                            android:layout_width="8dp"
+                            android:layout_height="0dp"/>
+
+                        <TextView
+                            android:id="@+id/cancel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/quantum_black_100"
+                            android:textSize="16sp"
+                            android:textStyle="normal"
+                            tools:text="Cancel" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+    <include layout="@layout/activity_navigation"/>
+
+</androidx.drawerlayout.widget.DrawerLayout>
+
+<!--<ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:id="@+id/place_tick_image"
@@ -314,36 +406,4 @@
                     android:shadowColor="@color/quantum_white_100"
                     android:shadowRadius="30"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true" />
-
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:id="@+id/place_cancel_image"
-                    android:src="@mipmap/ic_launcher_cancel"
-                    android:visibility="invisible"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/place_cancel_image"
-                    android:textSize="12sp"
-                    android:visibility="invisible"
-                    android:id="@+id/cancel"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:textStyle="bold"
-                    android:text="Cancel"
-                    android:layout_marginLeft="18dp"
-                    android:textColor="@color/quantum_black_100"
-                    android:shadowColor="@color/quantum_white_100"
-                    android:shadowRadius="30"
-                    android:layout_marginStart="18dp" />
-            </RelativeLayout>
-        </RelativeLayout>
-    </RelativeLayout>
-
-    <include layout="@layout/activity_navigation"/>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+                    android:layout_alignParentRight="true" />-->

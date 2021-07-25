@@ -242,7 +242,7 @@ public class LocationUpdatesService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setColor(Color.RED)
                 .setSmallIcon(R.drawable.notification_small_icon)
-                .setContentTitle("Location Reach Progress")
+                .setContentTitle("You're All Set")
                 .setContentText(text)
                 .setContentIntent(contentPendingIntent)
                 .setAutoCancel(true)
@@ -325,10 +325,10 @@ public class LocationUpdatesService extends Service {
         float[] results = new float[1];
         if (current!=null){
         Location.distanceBetween(target.latitude,target.longitude,latLng.latitude,latLng.longitude,results);
-        String dist=name+" : ";
+        String dist=name+" is ";
         if(results[0]-radius<=0)
         {
-            return name+" : Reached";
+            return name+" is Reached.";
         }
         else if (results[0]-radius>1000){
             dist= dist + String.format("%.2f",(results[0]-radius)/1000)+" km away";

@@ -49,7 +49,8 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     private RelativeLayout placeDetailsContainer;
     private Marker marker = null;
     private ImageView mCurrLoc;
-    private ImageView mRadiusTick,zoomIn,zoomOut;
+    private ImageView zoomIn,zoomOut;
+    private CardView mRadiusTick;
     private LatLng targetLatLng;
     private InterstitialAd interstitialAd;
     private TargetDetails targetDetails;
@@ -106,10 +107,6 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         marker=null;
         circle=null;
         confirm.setText("Confirm Radius");
-        if(dark)
-            mRadiusTick.setImageResource(R.mipmap.ic_launcher_confirm_radius_dark);
-        else
-            mRadiusTick.setImageResource(R.mipmap.ic_launcher_confirm_radius);
         mRadiusTick.setVisibility(View.VISIBLE);
         targetPlaceName.setText(targetDetails.getName());
         targetPlaceType.setText(targetDetails.getType());
@@ -127,14 +124,17 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
             @Override
             public void onCameraMoveStarted(int i)
             {
-                placeDetailsContainer.setVisibility(View.INVISIBLE);
+//                placeDetailsContainer.setVisibility(View.INVISIBLE);
+                placeDetailsContainer.setAlpha((float) 0.3);
             }
         });
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                placeDetailsContainer.setVisibility(View.VISIBLE);}
+//                placeDetailsContainer.setVisibility(View.VISIBLE);
+                placeDetailsContainer.setAlpha(1);
+            }
         });
 
         Animation animation = AnimationUtils.loadAnimation(this,R.anim.splash_animation);
@@ -173,14 +173,13 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 mRadiusTick.setVisibility(View.INVISIBLE);
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mRadiusTick.setVisibility(View.VISIBLE);
-                Animation animation = AnimationUtils.loadAnimation(MapsActivitySecondary.this,R.anim.tick_anim);
-                mRadiusTick.startAnimation(animation);
+                /*Animation animation = AnimationUtils.loadAnimation(MapsActivitySecondary.this,R.anim.tick_anim);
+                mRadiusTick.startAnimation(animation);*/
                 Toast.makeText(MapsActivitySecondary.this, "Radius set to "+(int) circle.getRadius()+"m", Toast.LENGTH_SHORT).show();
             }
         });

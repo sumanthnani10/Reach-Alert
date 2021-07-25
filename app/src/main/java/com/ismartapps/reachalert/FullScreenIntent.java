@@ -39,7 +39,7 @@ public class FullScreenIntent extends AppCompatActivity {
         TextView text = findViewById(R.id.location_name);
         Context context = this;
         Log.d(TAG, "onReceive: Stopping Ring");
-        String placeName = "Reached "+getIntent().getStringExtra("location_name");
+        String placeName = getIntent().getStringExtra("location_name");
         text.setText(placeName);
         stop.setOnClickListener(view -> {
             Utils.stopRing(context);
