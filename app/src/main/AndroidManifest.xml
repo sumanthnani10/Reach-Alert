@@ -64,6 +64,7 @@
         <activity android:name=".MapsActivityPrimary" android:label="@string/title_activity_maps_primary" android:theme="@style/AppThemeDark">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.ismartapps.reachalert.SplashActivity" />
         </activity>
+        <activity android:name=".AdsUnity" android:theme="@style/Theme.LoadScreen"/>
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/google_maps_key" />
         <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="@string/google_id" />
 
@@ -87,13 +88,6 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
-
-
-        <activity android:name="com.adcolony.sdk.AdColonyInterstitialActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:hardwareAccelerated="true"/>
-
-        <activity android:name="com.adcolony.sdk.AdColonyAdViewActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:hardwareAccelerated="true"/>
-
-
 
     </application>
 </manifest>

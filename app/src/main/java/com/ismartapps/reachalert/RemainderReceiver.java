@@ -19,9 +19,12 @@ import androidx.core.app.TaskStackBuilder;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -97,9 +100,11 @@ public class RemainderReceiver extends BroadcastReceiver {
             }
             mNotificationManager.notify(id, builder.build());
 
-            SharedPreferences sharedPreferences = context.getSharedPreferences("userdetails", MODE_PRIVATE);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-            databaseReference.child("Last Used").child(sharedPreferences.getString("dbname", "User Name")).child("Notified").setValue(new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
+
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseFirestore.getInstance().collection("users").document(user.getUid()).update("last_notified", FieldValue.serverTimestamp())
+                    .addOnCompleteListener(t -> {
+                    });
         }
     }
 

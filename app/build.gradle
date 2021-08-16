@@ -9,7 +9,7 @@ android {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
         }
         applicationId "com.ismartapps.reachalert"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode 32
         versionName "4.2"
@@ -31,7 +31,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.1'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
@@ -40,25 +40,28 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v13:28.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation project(':flutter')
+    implementation files('C:/Users/suman/StudioProjects/Reach Alert/unity-ads.aar')
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
-    implementation 'com.google.android.gms:play-services-auth:19.0.0'
-    implementation 'com.google.firebase:firebase-core:19.0.0'
-    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
-    implementation 'com.firebaseui:firebase-ui-database:5.0.0'
-    implementation 'com.google.firebase:firebase-database:19.2.0'
+    implementation 'androidx.browser:browser:1.3.0'
+
+    implementation platform('com.google.firebase:firebase-bom:28.3.1')
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-database'
+
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.adcolony:sdk:4.1.0'
-    implementation 'com.facebook.android:audience-network-sdk:5.5.0'
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
     implementation 'com.google.maps.android:android-maps-utils:0.4.4'
 
 

@@ -5,34 +5,54 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.core.ServerValues;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
     public String name;
     String TAG = "Login Activity";
-    FirebaseAuth mAuth;
-    FirebaseUser user;
-    SharedPreferences sharedPreferences;
+
+    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
+            new FirebaseAuthUIActivityResultContract(), this::onSignInResult
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Log.d(TAG, "onCreate");
+        Log.d(TAG, "onStart");
+        createSignInIntent();
+        SharedPreferences settings = getSharedPreferences("settings",MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("dark",false);
+        editor.apply();
     }
 
     @Override
@@ -44,26 +64,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart");
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
-        sharedPreferences = getSharedPreferences("userdetails",MODE_PRIVATE);
-        if(user!=null && ((user.getEmail()!=null && !user.getEmail().equals("")) || !sharedPreferences.getString("name","User Name").equals("User Name"))){
-            startMain();
-        }
-        else if(user==null)
-        {
-            createSignInIntent();
-            SharedPreferences settings = getSharedPreferences("settings",MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("dark",false);
-            editor.apply();
-        }
-        else if(sharedPreferences.getString("name","User Name").equals("User Name"))
-        {
-            Intent intent = new Intent(this,NamePrompt.class);
-            startActivity(intent);
-        }
     }
 
     @Override
@@ -75,57 +75,59 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void createSignInIntent() {
+        Log.d(TAG, "createSignInIntent");
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder().build());
 
-        startActivityForResult(
+        Intent signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setIsSmartLockEnabled(false)
+                .setLogo(R.mipmap.ic_launcher_icon)
+                .setTheme(R.style.AppTheme)
+                .build();
+        signInLauncher.launch(signInIntent);
+
+        /*startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
+                        .setIsSmartLockEnabled(false)
                         .setLogo(R.mipmap.ic_launcher_icon)
                         .setTheme(R.style.AppTheme)
                         .build(),
-                RC_SIGN_IN);
+                RC_SIGN_IN);*/
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
+        Log.d(TAG, "onSignInResult");
+        IdpResponse response = result.getIdpResponse();
+        if (result.getResultCode() == RESULT_OK) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
+            Log.d(TAG, "onActivityResult: Sign in Success");
+            startMain();
 
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "onActivityResult: Sign in Success");
-                if(user.getEmail()==null)
-                {
-                    Intent intent = new Intent(this,NamePrompt.class);
-                    startActivity(intent);
-                }
-                else{
-                    startMain();
-                }
-            } else {
-                Log.d(TAG, "onActivityResult: Sign in failed");
-            }
+        } else {
+            Log.d(TAG, "onActivityResult: Sign in failed");
         }
     }
 
     public void startMain(){
         Log.d(TAG, "startMain");
         Intent intent = getIntent();
-        Intent mainIntent = new Intent(this, MapsActivityPrimary.class);
+        Intent mainIntent = new Intent(this, SplashActivity.class);
         
         if(intent.getStringExtra("from").equals("SAN"))
         {
-        String text = intent.getStringExtra("name");
-        Log.d(TAG, "onCreate: "+text+" , "+intent.getExtras());
-        double[] latLng = intent.getExtras().getDoubleArray("latlng");
-        mainIntent.putExtra("name",text);
-        mainIntent.putExtra("placeId",intent.getStringExtra("placeId"));
-        mainIntent.putExtra("latlng",latLng);
+            String text = intent.getStringExtra("name");
+            Log.d(TAG, "onCreate: "+text+" , "+intent.getExtras());
+            double[] latLng = intent.getExtras().getDoubleArray("latlng");
+            mainIntent.putExtra("name",text);
+            mainIntent.putExtra("placeId",intent.getStringExtra("placeId"));
+            mainIntent.putExtra("latlng",latLng);
         }
         
         else if(intent.getStringExtra("shared location")!=null)

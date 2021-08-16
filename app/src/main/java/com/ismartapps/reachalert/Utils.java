@@ -21,6 +21,11 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -155,4 +160,26 @@ class Utils {
         Log.d(TAG, "clearNotifications");
         mNotificationManager.cancelAll();
     }
+
+
+    static String generateId(String pref) {
+        String chars = "zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA9876543210";
+        int char_length = chars.length();
+        Date t = new Date();
+//        LocalDate localDate = t.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDate();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Kolkata"));
+        calendar.setTime(t);
+        String id = pref;
+        // id += chars[(t.year / 100).round()];
+        id += chars.charAt(calendar.get(Calendar.YEAR) % char_length);
+        id += chars.charAt(calendar.get(Calendar.MONTH)+1);
+        id += chars.charAt(calendar.get(Calendar.DATE));
+        id += chars.charAt(calendar.get(Calendar.HOUR_OF_DAY));
+        id += chars.charAt(calendar.get(Calendar.MINUTE));
+        id += chars.charAt(calendar.get(Calendar.SECOND));
+        id += chars.charAt(calendar.get(Calendar.MILLISECOND) % char_length);
+//        id += chars.charAt(calendar.get(Calendar.MILLISECOND) % char_length);
+        return id;
+    }
+
 }

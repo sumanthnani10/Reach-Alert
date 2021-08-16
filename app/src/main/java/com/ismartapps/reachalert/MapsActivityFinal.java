@@ -29,12 +29,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.AdSettings;
-import com.facebook.ads.AudienceNetworkAds;
-import com.facebook.ads.InterstitialAd;
-import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -76,7 +70,6 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
     private DrawerLayout drawerLayout;
     private int activityCount;
     private String userName, placeId;
-    private InterstitialAd interstitialAd;
     private SharedPreferences targetDetail;
 
     private static final String TAG = MapsActivityFinal.class.getSimpleName();
@@ -106,10 +99,6 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
 
         targetDetail = getSharedPreferences("targetDetails", MODE_PRIVATE);
 
-        AudienceNetworkAds.initialize(this);
-        AdSettings.setIntegrationErrorMode(AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CALLBACK_MODE);
-        interstitialAd = new InterstitialAd(this, "478651842722184_480146339239401");
-        interstitialAd.loadAd();
         Log.d(TAG, "onCreate: Final");
     }
 
@@ -529,116 +518,11 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
 
     @Override
     protected void onDestroy() {
-        if (interstitialAd != null) {
-            interstitialAd.destroy();
-        }
         super.onDestroy();
     }
 
     void showAd()
-    {
-        Log.d(TAG, "showAd");
-        interstitialAd.setAdListener(new InterstitialAdListener() {
-            @Override
-            public void onInterstitialDisplayed(Ad ad) {
-                Log.d(TAG, "onInterstitialDisplayed: ");
-            }
-
-            @Override
-            public void onInterstitialDismissed(Ad ad) {
-                Log.d(TAG, "onInterstitialDismissed: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onError(Ad ad, AdError adError) {
-                Log.d(TAG, "onError: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-
-            }
-
-            @Override
-            public void onAdLoaded(Ad ad) {
-                Log.d(TAG, "onAdLoaded: ");
-                interstitialAd.show();
-            }
-
-            @Override
-            public void onAdClicked(Ad ad) {
-                Log.d(TAG, "onAdClicked: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onLoggingImpression(Ad ad) {
-                Log.d(TAG, "onLoggingImpression: ");
-            }
-        });
-
-        /*ADCOLONY-AdColonyInterstitialListener listener = new AdColonyInterstitialListener() {
-            @Override
-            public void onRequestFilled(AdColonyInterstitial ad) {
-                ad.show();
-            }
-            @Override
-            public void onOpened(AdColonyInterstitial ad) {
-                super.onOpened(ad);
-            }
-            @Override
-            public void onClicked(AdColonyInterstitial ad) {
-                super.onClicked(ad);
-                finish();
-            }
-            @Override
-            public void onExpiring(AdColonyInterstitial ad) {
-                super.onExpiring(ad);
-                finish();
-            }
-            @Override
-            public void onRequestNotFilled(AdColonyZone zone) {
-                super.onRequestNotFilled(zone);
-                finish();
-            }
-            @Override
-            public void onClosed(AdColonyInterstitial ad) {
-                super.onClosed(ad);
-                finish();
-            }
-        };
-        AdColony.requestInterstitial("vze1d0cb71432c4109b3",listener);*/
-        /*InterstitialAd mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getString(R.string.ad_unit_id));
-        mInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("CA06D3EADBD276408AD961E110AFC903").build());
-        mInterstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if(mInterstitialAd.isLoaded()){
-                    Log.d(TAG, "onAdLoaded: Showing Ad");
-                    mInterstitialAd.show();
-                }
-            }
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                Log.d(TAG, "onAdFailedToLoad");
-                finish();
-            }
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-                Log.d(TAG, "onAdClosed");
-                finish();
-            }
-        });*/
-
-    }
+    {}
 
     private void updateReached()
     {

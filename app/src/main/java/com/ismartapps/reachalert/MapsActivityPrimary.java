@@ -43,12 +43,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.AdSettings;
-import com.facebook.ads.AudienceNetworkAds;
-import com.facebook.ads.InterstitialAd;
-import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -78,6 +72,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.android.SphericalUtil;
 import com.squareup.picasso.Picasso;
 
@@ -124,7 +120,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
     private SharedPreferences recents;
     private SharedPreferences settings;
     private AutocompleteSupportFragment autocompleteFragment;
-    private InterstitialAd interstitialAd;
     private List<String> notPermittedPermission = new ArrayList<String>();
     int askignBgLocPerms = 0;
 
@@ -142,11 +137,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             setContentView(R.layout.activity_maps);
         }
         initVars();
-        AudienceNetworkAds.initialize(this);
-        AudienceNetworkAds.isInAdsProcess(this);
-        AdSettings.setIntegrationErrorMode(AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CALLBACK_MODE);
-        interstitialAd = new InterstitialAd(this, "478651842722184_478653109388724");
-        interstitialAd.loadAd();
         searched = getSharedPreferences("searched", MODE_PRIVATE);
         recents = getSharedPreferences("recent", MODE_PRIVATE);
         updateSearchMenu();
@@ -160,6 +150,11 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             checkLocation();
         }
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).update("last_opened", FieldValue.serverTimestamp())
+                .addOnCompleteListener(t -> {
+                    Log.d(TAG, "onCreate: Last Opened updated");
+                });
     }
 
     private void updateSearched(String locationName, String placeId) {
@@ -537,16 +532,10 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 switch (view.getId()) {
                     case R.id.confirm_button:
                         goToSecondary();
-                        /*ADCOLONY-if(confirmAd!=null)
-                        confirmAd.destroy();*/
-                        /*FACEBOOK-if(adView!=null)adView.destroy();*/
                         dismiss();
                         break;
 
                     case R.id.no_button:
-                        /*ADCOLONY-if(confirmAd!=null)
-                        confirmAd.destroy();*/
-                        /*FACEBOOK-if(adView!=null)adView.destroy();*/
                         dismiss();
                         break;
                 }
@@ -717,51 +706,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 .into(userPic);
     }
 
-    void showAd() {
-        Log.d(TAG, "showAd");
-        interstitialAd.setAdListener(new InterstitialAdListener() {
-            @Override
-            public void onInterstitialDisplayed(Ad ad) {
-                Log.d(TAG, "onInterstitialDisplayed: ");
-            }
-
-            @Override
-            public void onInterstitialDismissed(Ad ad) {
-                Log.d(TAG, "onInterstitialDismissed: ");
-                if (interstitialAd != null) {
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onError(Ad ad, AdError adError) {
-                Log.d(TAG, "onError: ");
-                if (interstitialAd != null) {
-                    interstitialAd.destroy();
-                }
-
-            }
-
-            @Override
-            public void onAdLoaded(Ad ad) {
-                Log.d(TAG, "onAdLoaded: ");
-                interstitialAd.show();
-            }
-
-            @Override
-            public void onAdClicked(Ad ad) {
-                Log.d(TAG, "onAdClicked: ");
-                if (interstitialAd != null) {
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onLoggingImpression(Ad ad) {
-                Log.d(TAG, "onLoggingImpression: ");
-            }
-        });
-    }
+    void showAd() {}
 
     private void checkLocation() {
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -827,11 +772,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
 
     @Override
     protected void onDestroy() {
-        /*if(drawerAd!=null)
-        drawerAd.destroy();*/
-
-        /*FACEBOOK-if(adView!=null)adView.destroy();*/
-
         super.onDestroy();
     }
 
@@ -1297,6 +1237,9 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
             }
+        }
+        if (requestCode == 132) {
+            Log.d(TAG, "onActivityResult: "+data.getBooleanExtra("ad_status", false));
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -1,7 +1,10 @@
 package com.ismartapps.reachalert;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,16 +17,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.AdSettings;
-import com.facebook.ads.AudienceNetworkAds;
-import com.facebook.ads.InterstitialAd;
-import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,7 +37,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.android.SphericalUtil;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapsActivitySecondary extends FragmentActivity implements OnMapReadyCallback {
 
@@ -52,11 +61,25 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     private ImageView zoomIn,zoomOut;
     private CardView mRadiusTick;
     private LatLng targetLatLng;
-    private InterstitialAd interstitialAd;
     private TargetDetails targetDetails;
     private int clickCount=0,activityCount;
     private DrawerLayout drawerLayout;
     private boolean dark;
+    private final ActivityResultLauncher<Intent> adsScriptCaller = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Log.d(TAG, "onActivityResult: "+result.getResultCode());
+//                    if (result.getResultCode() == 132) {
+                        Intent data = result.getData();
+                        boolean rewarded = data.getBooleanExtra("ad_status", false);
+                        Log.d(TAG, "onActivityResult: "+rewarded);
+                        goToFinal();
+//                    }
+                }
+            }
+    );
 
 
     @Override
@@ -76,11 +99,6 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.maps_primary);
         mapFragment.getMapAsync(this);
-        //ADCOLONY-AdColony.configure(this, "app72332c41df0a460897", "vz1446be3697b24002b8");
-        AudienceNetworkAds.initialize(this);
-        AdSettings.setIntegrationErrorMode(AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CALLBACK_MODE);
-        interstitialAd = new InterstitialAd(this, "478651842722184_478653109388724");
-        interstitialAd.loadAd();
         Log.d(TAG, "onCreate: Secondary");
     }
 
@@ -104,6 +122,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         Intent intent = getIntent();
         targetDetails = intent.getExtras().getParcelable("targetDetails");
+        targetDetails.setRadius(500);
         marker=null;
         circle=null;
         confirm.setText("Confirm Radius");
@@ -221,8 +240,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
             if (clickCount==1){
                 Toast.makeText(this, "Radius Confirmed", Toast.LENGTH_SHORT).show();
                 //Show Ad
-                goToFinal();
-                finish();
+                showAd();
             }
         });
 
@@ -234,8 +252,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
                 if (clickCount==1){
                     Toast.makeText(MapsActivitySecondary.this, "Radius Confirmed", Toast.LENGTH_SHORT).show();
                     //Show Ad
-                    goToFinal();
-                    finish();
+                    showAd();
                 }
 
             }
@@ -253,9 +270,6 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
 
     @Override
     protected void onDestroy() {
-        if (interstitialAd != null) {
-            interstitialAd.destroy();
-        }
         super.onDestroy();
     }
 
@@ -268,55 +282,13 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         }
         else
         {
-            showAd();
+//            showAd();
         }
     }
 
-    void showAd()
-    {
-        Log.d(TAG, "showAd");
-        interstitialAd.setAdListener(new InterstitialAdListener() {
-            @Override
-            public void onInterstitialDisplayed(Ad ad) {
-                Log.d(TAG, "onInterstitialDisplayed: ");
-            }
-
-            @Override
-            public void onInterstitialDismissed(Ad ad) {
-                Log.d(TAG, "onInterstitialDismissed: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onError(Ad ad, AdError adError) {
-                Log.d(TAG, "onError: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-
-            }
-
-            @Override
-            public void onAdLoaded(Ad ad) {
-                Log.d(TAG, "onAdLoaded: ");
-                interstitialAd.show();
-            }
-
-            @Override
-            public void onAdClicked(Ad ad) {
-                Log.d(TAG, "onAdClicked: ");
-                if(interstitialAd!=null){
-                    interstitialAd.destroy();
-                }
-            }
-
-            @Override
-            public void onLoggingImpression(Ad ad) {
-                Log.d(TAG, "onLoggingImpression: ");
-            }
-        });
+    void showAd() {
+        Intent adIntent = new Intent(this, AdsUnity.class);
+        adsScriptCaller.launch(adIntent);
     }
 
     @Override
@@ -325,11 +297,43 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     }
 
     private void goToFinal() {
-        Intent intent = new Intent(this,MapsActivityFinal.class);
-        targetDetails.setRadius(circle.getRadius());
-        intent.putExtra("targetDetails", targetDetails);
-        intent.putExtra("from",2);
-        startActivity(intent);
+        Map<String, Object> targetData = new HashMap<>();
+        String address = targetDetails.getAddress();
+        if(address.length()>50){
+            address = address.substring(0,47);
+            address = address + "...";
+        }
+
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        float[] results = new float[1];
+        Location.distanceBetween(targetDetails.getTarget().latitude, targetDetails.getTarget().longitude, targetDetails.getCurrent().latitude, targetDetails.getCurrent().longitude,results);
+        String dist = "";
+        double radius = circle.getRadius();
+        if (results[0]-radius>1000){
+            dist= dist + String.format("%.2f",(results[0]-radius)/1000)+" km";
+        }
+        else {
+            dist = dist + ((int) results[0] - radius) + " m";
+        }
+
+        targetData.put("to", ""+targetDetails.getName()+";"+address+";"+targetDetails.getTarget().latitude+";"+targetDetails.getTarget().longitude+";"+targetDetails.getCurrent().latitude+";"+targetDetails.getCurrent().longitude+";"+String.format("%.2f",(radius))+" m;"+dist);
+        targetData.put("on", timestamp);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).update("history", FieldValue.arrayUnion(targetData))
+                .addOnCompleteListener(t -> {
+                    if(t.isSuccessful()){
+                        Log.d(TAG, "goToFinal: updated history successfully");
+                    } else {
+                        Log.d(TAG, "goToFinal: updated history not successful");
+                    }
+                    Intent intent = new Intent(this,MapsActivityFinal.class);
+                    targetDetails.setRadius(circle.getRadius());
+                    intent.putExtra("targetDetails", targetDetails);
+                    intent.putExtra("from",2);
+                    startActivity(intent);
+                    finish();
+                });
     }
 
     @Override
@@ -344,6 +348,5 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         if(dark)
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.mapstyle_night));
     }
-
 
 }
