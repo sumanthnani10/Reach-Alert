@@ -38,6 +38,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class LocationUpdatesService extends Service {
@@ -232,6 +233,7 @@ public class LocationUpdatesService extends Service {
         PendingIntent contentPendingIntent = PendingIntent.getActivity(this,0,intent1,0);
 
         CharSequence text = getDistance(name,latLng);
+        Log.d(TAG, "getNotification: "+new Date() + text);
 
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);

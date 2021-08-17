@@ -45,8 +45,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -65,7 +63,6 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
     private LatLng targetLatLng;
     private static FusedLocationProviderClient mFusedLocationClient;
     public static double[] tempd = new double[3];
-    private static DatabaseReference databaseReference;
     private TargetDetails targetDetails;
     private DrawerLayout drawerLayout;
     private int activityCount;
@@ -163,6 +160,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
 
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(targetLatLng, 15f));
+
         marker = mMap.addMarker(new MarkerOptions().position(targetLatLng).title(targetPlaceName.getText().toString()).draggable(false));
         circle = mMap.addCircle(new CircleOptions()
                 .center(targetLatLng)
@@ -170,9 +168,11 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
                 .radius(radius)
                 .strokeColor(R.color.imageColor3));
 
+        circle.setFillColor(0x22ffff00);
+
         if (dark) {
             circle.setStrokeColor(R.color.quantum_black_100);
-            circle.setFillColor(R.color.white);
+//            circle.setFillColor(R.color.white);
         }
 
         tempd[0] = targetLatLng.latitude;
@@ -182,7 +182,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         Calendar calendar = Calendar.getInstance();
         SharedPreferences sharedPreferences = getSharedPreferences("userdetails", MODE_PRIVATE);
 
-        if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("") && FirebaseAuth.getInstance().getCurrentUser().getEmail() != null) {
+        /*if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("") && FirebaseAuth.getInstance().getCurrentUser().getEmail() != null) {
             uploadData(true, FirebaseAuth.getInstance().getCurrentUser().getEmail(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
                     targetPlaceName.getText().toString(), targetPlaceAddress.getText().toString(), targetLatLng,
                     new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
@@ -192,7 +192,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
                     targetPlaceName.getText().toString(), targetPlaceAddress.getText().toString(), targetLatLng,
                     new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
             userName = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber();
-        }
+        }*/
 
         if (!fromNotification)
             scheduleNotification();
@@ -214,7 +214,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
                     case R.id.confirm_button:
 
                         Toast.makeText(MapsActivityFinal.this, "Stopped Tracking", Toast.LENGTH_SHORT).show();
-                        updateCancelled();
+//                        updateCancelled();
                         Intent intent1 = new Intent(MapsActivityFinal.this, LocationUpdatesService.class);
                         intent1.setAction(LocationUpdatesService.ACTION_STOP_FOREGROUND_SERVICE);
                         startService(intent1);
@@ -250,7 +250,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
                     case R.id.confirm_button:
 
                         Toast.makeText(MapsActivityFinal.this, "Stopped Tracking", Toast.LENGTH_SHORT).show();
-                        updateCancelled();
+//                        updateCancelled();
                         Intent intent1 = new Intent(MapsActivityFinal.this, LocationUpdatesService.class);
                         intent1.setAction(LocationUpdatesService.ACTION_STOP_FOREGROUND_SERVICE);
                         startService(intent1);
@@ -289,7 +289,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra("Stop", false)) {
                 stopTracking();
-                updateCancelled();
+//                updateCancelled();
                 try {
                     if (fromNotification) {
                         startActivity(new Intent(MapsActivityFinal.this, MapsActivityPrimary.class));
@@ -315,7 +315,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
                         Utils.sendNotificationOnComplete(LocationUpdatesService.getName(), context);
                         Utils.playRing(context);
                         stopTracking();
-                        updateReached();
+//                        updateReached();
                         try {
                             finish();
                         } catch (Exception e) {
@@ -341,12 +341,11 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         zoomIn.setVisibility(View.INVISIBLE);
         zoomOut = findViewById(R.id.zoom_ot);
         zoomOut.setVisibility(View.INVISIBLE);
-        databaseReference = FirebaseDatabase.getInstance().getReference();
         drawerLayout = findViewById(R.id.drawer_layout);
         changeRadius = findViewById(R.id.change_radius);
     }
 
-    private void uploadData(boolean mail, String email, String name, String targetName, String targetAddress, LatLng targetlatLng, String time) {
+    /*private void uploadData(boolean mail, String email, String name, String targetName, String targetAddress, LatLng targetlatLng, String time) {
         UserLatestData user = new UserLatestData(targetName, targetAddress, targetlatLng, time);
         if (mail) {
             databaseReference.child("Last Used").child(name).setValue(user);
@@ -366,7 +365,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
             databaseReference.child("Last Used").child(email).child("Status").child("Stopped Ring").setValue("false " + new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
 
         }
-    }
+    }*/
 
     private void updateRecents(String locationName, LatLng latLng, String placeId) {
         SharedPreferences recents = getSharedPreferences("recent", MODE_PRIVATE);
@@ -524,7 +523,7 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
     void showAd()
     {}
 
-    private void updateReached()
+    /*private void updateReached()
     {
         SharedPreferences recents = getSharedPreferences("recent", MODE_PRIVATE);
         SharedPreferences.Editor editor = recents.edit();
@@ -539,5 +538,5 @@ public class MapsActivityFinal extends FragmentActivity implements OnMapReadyCal
         databaseReference.child("Last Used").child(userName).child("Status").child("Reached").setValue("true "+new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
         databaseReference.child("Last Used").child(userName).child("Status").child("Cancelled").setValue("true "+new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
         databaseReference.child("Last Used").child(userName).child("Status").child("Running").setValue("false "+new SimpleDateFormat("dd-MMM-yy hh:mm:ss a zzzz",new Locale("EN")).format(new Date()));
-    }
+    }*/
 }

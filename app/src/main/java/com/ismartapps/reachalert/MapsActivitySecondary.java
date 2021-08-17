@@ -3,6 +3,7 @@ package com.ismartapps.reachalert;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -75,6 +76,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
                         Intent data = result.getData();
                         boolean rewarded = data.getBooleanExtra("ad_status", false);
                         Log.d(TAG, "onActivityResult: "+rewarded);
+                        showLoading(false);
                         goToFinal();
 //                    }
                 }
@@ -137,8 +139,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         LatLng currentLatLng = targetDetails.getCurrent();
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(targetLatLng,15f));
         marker = mMap.addMarker(new MarkerOptions().position(targetLatLng).title(targetPlaceName.getText().toString()).draggable(false));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLatLng,15f));
-
+//        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(17.432261826582238,78.38743507862091),17.52565f,67.5f, 302.02368f)));
         mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
             public void onCameraMoveStarted(int i)
@@ -153,6 +154,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
             public void onCameraIdle() {
 //                placeDetailsContainer.setVisibility(View.VISIBLE);
                 placeDetailsContainer.setAlpha(1);
+//                Log.d(TAG, "onCameraIdle: "+mMap.getCameraPosition());
             }
         });
 
@@ -173,10 +175,12 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
                 .radius(minRadius)
                 .strokeColor(R.color.imageColor3));
 
+        circle.setFillColor(0x22ffff00);
+
         if (dark)
         {
             circle.setStrokeColor(R.color.quantum_black_100);
-            circle.setFillColor(R.color.white);
+//            circle.setFillColor(R.color.white);
         }
 
         radiusController.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -287,6 +291,7 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
     }
 
     void showAd() {
+        showLoading(true);
         Intent adIntent = new Intent(this, AdsUnity.class);
         adsScriptCaller.launch(adIntent);
     }
@@ -347,6 +352,15 @@ public class MapsActivitySecondary extends FragmentActivity implements OnMapRead
         init();
         if(dark)
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.mapstyle_night));
+    }
+
+    private void showLoading(boolean show) {
+        RelativeLayout loading = findViewById(R.id.loading);
+        if(show) {
+            loading.setVisibility(View.VISIBLE);
+        } else {
+            loading.setVisibility(View.GONE);
+        }
     }
 
 }

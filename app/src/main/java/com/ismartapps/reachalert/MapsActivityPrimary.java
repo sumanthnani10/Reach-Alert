@@ -70,8 +70,6 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.android.SphericalUtil;
@@ -151,9 +149,9 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         }
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).update("last_opened", FieldValue.serverTimestamp())
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).update("last_opened", FieldValue.serverTimestamp(), "devices", FieldValue.arrayUnion(Build.BRAND +" - "+ Build.DEVICE +" - "+ Build.HARDWARE), "versions", FieldValue.arrayUnion("4.3"))
                 .addOnCompleteListener(t -> {
-                    Log.d(TAG, "onCreate: Last Opened updated");
+                    Log.d(TAG, "onCreate: Last Opened updated - "+t.isSuccessful());
                 });
     }
 
@@ -305,6 +303,7 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             Log.d(TAG, "onPoiClick: (Primary) Clicked on " + pointOfInterest.name);
             targetPlaceId = pointOfInterest.placeId;
             fetchPlaceDetails(pointOfInterest.placeId);
+
         });
 
         mMap.setOnCameraMoveStartedListener(i -> {
@@ -332,9 +331,10 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                     @Override
                     public void run() {
                         drawerLayout.closeDrawer(GravityCompat.START, true);
-                    }
+                        }
                 }, 500);
             }
+
             if (mLocationTick.getVisibility() == View.VISIBLE) {
                 Log.d(TAG, "onCameraIdle");
 //                Animation animation = AnimationUtils.loadAnimation(MapsActivityPrimary.this,R.anim.tick_anim);
@@ -394,7 +394,8 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         zoomOut.setOnClickListener(view -> {
             CameraPosition zoomOutPosition = new CameraPosition.Builder()
                     .target(mMap.getCameraPosition().target)
-                    .tilt(32f).zoom((float) (mMap.getCameraPosition().zoom - (0.75))).build();
+                    .bearing(mMap.getCameraPosition().bearing)
+                    .tilt(mMap.getCameraPosition().tilt).zoom((float) (mMap.getCameraPosition().zoom - (0.75))).build();
             Log.d(TAG, "onClick: Zoom Out");
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(zoomOutPosition));
         });
@@ -402,7 +403,8 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         zoomIn.setOnClickListener(view -> {
             CameraPosition zoomInPosition = new CameraPosition.Builder()
                     .target(mMap.getCameraPosition().target)
-                    .tilt(32f).zoom((float) (mMap.getCameraPosition().zoom + (0.75))).build();
+                    .bearing(mMap.getCameraPosition().bearing)
+                    .tilt(mMap.getCameraPosition().tilt).zoom((float) (mMap.getCameraPosition().zoom + (0.75))).build();
             Log.d(TAG, "onClick: Zoom In");
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(zoomInPosition));
         });
@@ -672,7 +674,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
         SharedPreferences sharedPreferences = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String dbname = "User Name";
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user.getEmail() != null && !user.getEmail().equals("")) {
@@ -683,8 +684,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             if (dbname != null) {
                 dbname = dbname.replaceAll("\\.", "_").replaceAll("#", "_").replaceAll("\\$", "_").replaceAll("\\[", "_").replaceAll("]", "_");
             }
-            databaseReference.child("Last Used").child(dbname).child("name").setValue(user.getDisplayName());
-            databaseReference.child("Last Used").child(dbname).child("email").setValue(user.getEmail());
             editor.putString("dbname", dbname);
         } else {
             Log.d(TAG, "init phone number ");
@@ -692,13 +691,13 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
             sharedPreferences = getSharedPreferences("userdetails", MODE_PRIVATE);
             userName.setText(sharedPreferences.getString("name", "User Name"));
             dbname = user.getPhoneNumber();
-            databaseReference.child("Last Used").child(dbname).child("name").setValue(userName.getText());
-            databaseReference.child("Last Used").child(dbname).child("email").setValue(dbname);
+//            databaseReference.child("Last Used").child(dbname).child("name").setValue(userName.getText());
+//            databaseReference.child("Last Used").child(dbname).child("email").setValue(dbname);
             editor.putString("dbname", dbname);
         }
 
         editor.apply();
-        databaseReference.child("Last Used").child(dbname).child("Last Opened").setValue(new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
+//        databaseReference.child("Last Used").child(dbname).child("Last Opened").setValue(new SimpleDateFormat("dd-MMM-yyyy,E hh:mm:ss a zzzz", new Locale("EN")).format(new Date()));
         Picasso.get()
                 .load(user.getPhotoUrl())
                 .error(R.mipmap.ic_user_image)
@@ -851,7 +850,6 @@ public class MapsActivityPrimary extends FragmentActivity implements OnMapReadyC
                 zoom = 5f;
             else zoom = 20f;
             movecamera(place.getLatLng(), zoom, place.getName(), place.getAddress(), placeType);
-
 
             if (place.getPhotoMetadatas() != null) {
                 if (place.getPhotoMetadatas().size() > 0) {

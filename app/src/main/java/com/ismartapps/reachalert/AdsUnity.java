@@ -16,6 +16,7 @@ import androidx.cardview.widget.CardView;
 
 import com.unity3d.ads.IUnityAdsInitializationListener;
 import com.unity3d.ads.IUnityAdsListener;
+import com.unity3d.ads.IUnityAdsLoadListener;
 import com.unity3d.ads.IUnityAdsShowListener;
 import com.unity3d.ads.UnityAds;
 
@@ -23,7 +24,7 @@ public class AdsUnity extends AppCompatActivity {
 
     private static final String TAG = "Unity Ads Script";
     private final String placementID = "Rewarded_Android";
-    private final Boolean testMode = true;
+    private final Boolean testMode = false;
     private Context context;
     private boolean showed = false;
 
@@ -49,20 +50,19 @@ public class AdsUnity extends AppCompatActivity {
         final UnityAdsInitListener myAdsInitListener = new UnityAdsInitListener();
         UnityAds.addListener(myAdsListener);
         String unityGameID = "4257683";
-        /*if(UnityAds.isInitialized()){
-            showed = true;
-            displayRewardedAd();
-        } else {*/
-            UnityAds.initialize(context, unityGameID, testMode, myAdsInitListener);
-//        }
+        Log.d(TAG, "init: "+UnityAds.isInitialized());
+        UnityAds.initialize(context, unityGameID, testMode, true,myAdsInitListener);
     }
 
     private void displayRewardedAd () {
         Log.d(TAG, "displayRewardedAd");
         if (UnityAds.isInitialized()) {
             Log.d(TAG, "displayRewardedAd: isInited");
-            final UnityAdsShowListener myAdsShowListener = new UnityAdsShowListener();
-            UnityAds.show(this, placementID, myAdsShowListener);
+            if(UnityAds.getPlacementState(placementID) == UnityAds.PlacementState.READY) {
+                Log.d(TAG, "displayRewardedAd: "+UnityAds.getPlacementState(placementID));
+                final UnityAdsShowListener myAdsShowListener = new UnityAdsShowListener();
+                UnityAds.show(this, placementID,myAdsShowListener);
+            }
         }
     }
 
@@ -77,9 +77,9 @@ public class AdsUnity extends AppCompatActivity {
         @Override
         public void onInitializationComplete() {
             Log.d(TAG, "onInitializationComplete");
-            if(UnityAds.getPlacementState(placementID) == UnityAds.PlacementState.READY && !showed){
-                showed = true;
-                displayRewardedAd();
+            if(UnityAds.getPlacementState(placementID) != UnityAds.PlacementState.READY){
+                final UnityAdsLoadListener myAdsLoadListener = new UnityAdsLoadListener();
+                UnityAds.load(placementID, myAdsLoadListener);
             }
         }
 
@@ -95,7 +95,8 @@ public class AdsUnity extends AppCompatActivity {
         @Override
         public void onUnityAdsReady(String s) {
             Log.d(TAG, "onUnityAdsReady "+s);
-            if(s.equals("Rewarded_Android") && !showed){
+            if(s.equals(placementID) && !showed){
+                Log.d(TAG, "onUnityAdsReady: displaying Ad");
                 showed = true;
                 displayRewardedAd();
             }
@@ -114,6 +115,24 @@ public class AdsUnity extends AppCompatActivity {
         @Override
         public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
             Log.d(TAG, "onUnityAdsFinish: "+s+" "+unityAdsError.toString());
+        }
+    }
+
+    private class UnityAdsLoadListener implements IUnityAdsLoadListener {
+        @Override
+        public void onUnityAdsAdLoaded(String s) {
+            Log.d(TAG, "onUnityAdsAdLoaded: "+s);
+            if(s.equals(placementID) && !showed){
+                Log.d(TAG, "onUnityAdsAdLoaded: displaying Ad");
+                showed = true;
+                displayRewardedAd();
+            }
+            
+        }
+
+        @Override
+        public void onUnityAdsFailedToLoad(String s, UnityAds.UnityAdsLoadError unityAdsLoadError, String s1) {
+            Log.d(TAG, "onUnityAdsFailedToLoad: "+s+" ; "+s1+" ; "+unityAdsLoadError.toString());
         }
     }
 

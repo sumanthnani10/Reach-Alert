@@ -64,7 +64,7 @@
         <activity android:name=".MapsActivityPrimary" android:label="@string/title_activity_maps_primary" android:theme="@style/AppThemeDark">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.ismartapps.reachalert.SplashActivity" />
         </activity>
-        <activity android:name=".AdsUnity" android:theme="@style/Theme.LoadScreen"/>
+        <activity android:name=".AdsUnity" android:label="" android:theme="@style/Theme.LoadScreen"/>
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/google_maps_key" />
         <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="@string/google_id" />
 

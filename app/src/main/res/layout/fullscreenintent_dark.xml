@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:src="@mipmap/ic_launcher_icon_foreground"
+        android:src="@drawable/fsi_logo"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="50dp"/>
 
